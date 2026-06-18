@@ -1,229 +1,55 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Tip Calculator</title>
-    <style>
-      :root {
-        --bg: #f7f7f7;
-        --card: #ffffff;
-        --accent: #2b8aef;
-        --muted: #666;
-        --success: #16a34a;
-      }
+<!DOCTYPE html>
+<html>
+<body>
 
-      html, body {
-        height: 100%;
-      }
+<!-- Page title shown on the webpage -->
+<h2>Tip Calculator</h2>
 
-      body {
-        font-family: Arial, Helvetica, sans-serif;
-        margin: 0;
-        padding: 24px;
-        background: linear-gradient(180deg, var(--bg), #eef6ff);
-        color: #111;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
+<!-- Input field for bill amount -->
+<input type="number" id="bill" placeholder="Bill Amount">
 
-      .card {
-        width: 100%;
-        max-width: 520px;
-        background: var(--card);
-        box-shadow: 0 6px 18px rgba(20, 40, 80, 0.08);
-        border-radius: 10px;
-        padding: 20px;
-      }
+<!-- Input field for tip percentage -->
+<input type="number" id="tip" placeholder="Tip %">
 
-      h1 {
-        margin: 0 0 12px 0;
-        font-size: 1.25rem;
-      }
+<!-- Button that runs the JavaScript function when clicked -->
+<button onclick="calculateTip()">Calculate</button>
 
-      .row {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-      }
+<!-- Area where the result (tip + total) will be displayed -->
+<p id="result"></p>
 
-      label {
-        display: block;
-        font-size: 0.9rem;
-        color: var(--muted);
-        margin-bottom: 6px;
-      }
+<script>
 
-      input[type="number"], select {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid #dcdcdc;
-        border-radius: 6px;
-        font-size: 1rem;
-        box-sizing: border-box;
-      }
+// Function that calculates the tip and total bill
+function calculateTip() {
 
-      .grid {
-        display: grid;
-        gap: 12px;
-      }
+    // Get bill value from input and convert it to a number
+    let bill = Number(document.getElementById("bill").value);
 
-      .actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 12px;
-      }
+    // Get tip percentage value from input and convert it to a number
+    let tip = Number(document.getElementById("tip").value);
 
-      button {
-        padding: 10px 14px;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        font-weight: 600;
-      }
+    // Calculate tip amount based on percentage
+    let tipAmount = bill * tip / 100;
 
-      .btn-primary {
-        background: var(--accent);
-        color: white;
-      }
+    // Calculate total amount (bill + tip)
+    let total = bill + tipAmount;
 
-      .btn-secondary {
-        background: #f1f5f9;
-        color: #111;
-      }
+    // Display results in the paragraph with id "result"
+    document.getElementById("result").innerHTML =
+        "Tip: ₱" + tipAmount.toFixed(2) +   // format tip to 2 decimal places
+        "<br>Total: ₱" + total.toFixed(2);  // format total to 2 decimal places 
+}
 
-      .result {
-        margin-top: 16px;
-        padding: 12px;
-        background: #f8fafc;
-        border-radius: 8px;
-        border: 1px solid #eef2ff;
-      }
+</script>
 
-      .muted {
-        color: var(--muted);
-        font-size: 0.9rem;
-      }
-
-      @media (min-width: 520px) {
-        .grid-2 { grid-template-columns: 1fr 1fr; }
-      }
-    </style>
-  </head>
-
-  <body>
-    <main class="card" role="main">
-      <h1>Tip Calculator</h1>
-
-      <form id="tip-form" class="grid">
-        <div>
-          <label for="bill">Bill amount</label>
-          <input id="bill" name="bill" type="number" min="0" step="0.01" placeholder="e.g. 42.50" required />
-        </div>
-
-        <div>
-          <label for="tip">Tip percentage</label>
-          <select id="tip" name="tip">
-            <option value="15">15%</option>
-            <option value="18">18%</option>
-            <option value="20" selected>20%</option>
-            <option value="25">25%</option>
-            <option value="0">Custom...</option>
-          </select>
-        </div>
-
-        <div id="custom-tip-row" style="display:none;">
-          <label for="customTip">Custom tip (%)</label>
-          <input id="customTip" name="customTip" type="number" min="0" max="100" step="0.1" placeholder="e.g. 17.5" />
-        </div>
-
-        <div>
-          <label for="people">Number of people</label>
-          <input id="people" name="people" type="number" min="1" step="1" value="1" />
-        </div>
-
-        <div class="actions">
-          <button type="submit" class="btn-primary">Calculate</button>
-          <button type="button" id="reset" class="btn-secondary">Reset</button>
-        </div>
-      </form>
-
-      <section id="output" class="result" aria-live="polite" hidden>
-        <div>
-          <div class="muted">Tip amount</div>
-          <div id="tipAmount" style="font-size:1.1rem;font-weight:700">$0.00</div>
-        </div>
-        <div style="margin-top:10px;">
-          <div class="muted">Total per person</div>
-          <div id="perPerson" style="font-size:1.1rem;font-weight:700">$0.00</div>
-        </div>
-      </section>
-
-      <p class="muted" style="margin-top:12px;">Tip calculator — enter your bill, choose a tip, and split between people.</p>
-    </main>
-
-    <script>
-      (function () {
-        const form = document.getElementById('tip-form');
-        const billEl = document.getElementById('bill');
-        const tipEl = document.getElementById('tip');
-        const customTipRow = document.getElementById('custom-tip-row');
-        const customTipEl = document.getElementById('customTip');
-        const peopleEl = document.getElementById('people');
-        const output = document.getElementById('output');
-        const tipAmountEl = document.getElementById('tipAmount');
-        const perPersonEl = document.getElementById('perPerson');
-        const resetBtn = document.getElementById('reset');
-
-        function formatCurrency(val) {
-          return val.toLocaleString(undefined, { style: 'currency', currency: 'USD' });
-        }
-
-        tipEl.addEventListener('change', (e) => {
-          if (e.target.value === '0') {
-            customTipRow.style.display = '';
-            customTipEl.required = true;
-            customTipEl.focus();
-          } else {
-            customTipRow.style.display = 'none';
-            customTipEl.required = false;
-          }
-        });
-
-        form.addEventListener('submit', (e) => {
-          e.preventDefault();
-
-          const bill = parseFloat(billEl.value) || 0;
-          let tipPercent = parseFloat(tipEl.value);
-
-          if (tipPercent === 0) {
-            tipPercent = parseFloat(customTipEl.value) || 0;
-          }
-
-          const people = Math.max(1, parseInt(peopleEl.value, 10) || 1);
-
-          const tipTotal = (bill * (tipPercent / 100));
-          const total = bill + tipTotal;
-
-          const perPerson = total / people;
-          const tipPerPerson = tipTotal / people;
-
-          tipAmountEl.textContent = formatCurrency(tipPerPerson);
-          perPersonEl.textContent = formatCurrency(perPerson);
-
-          output.hidden = false;
-        });
-
-        resetBtn.addEventListener('click', () => {
-          form.reset();
-          customTipRow.style.display = 'none';
-          customTipEl.required = false;
-          output.hidden = true;
-          tipAmountEl.textContent = '$0.00';
-          perPersonEl.textContent = '$0.00';
-        });
-      })();
-    </script>
-  </body>
+</body>
 </html>
+
+<!--Coding with AI means using artificial intelligence tools to write, understand and improve code rather than doing everything manually. 
+You describe your desired outcome in natural language while the AI performs generating code alongside explanations of workings or improvements. 
+Such an element works well as an assistant within the coding process especially during learning or faster development.
+
+This means shifting from purely writing code lines to guiding and checking what gets produced by the AI. 
+While you will still need an understanding of the logic and output, and decisions regarding correctness or design the AI can handle repetitive or
+complex tasks while humans focus upon planning, problem solving and ensuring the program actually works as intended.-->
+
