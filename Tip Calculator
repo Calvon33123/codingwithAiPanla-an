@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tip Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 480px; margin: auto; }
+    label, input { display:block; width:100%; margin-bottom:8px; }
+    .row { display:flex; gap:8px; }
+    input[type="number"] { padding:8px; font-size:1rem; }
+    button { padding:10px; font-size:1rem; cursor:pointer; }
+    .result { margin-top:12px; font-weight:600; }
+  </style>
+</head>
+<body>
+  <h1>Tip Calculator</h1>
+  <label for="bill">Bill amount ($)</label>
+  <input id="bill" type="number" min="0" step="0.01" placeholder="e.g., 42.50">
+  <label for="tipPercent">Tip percentage (%)</label>
+  <input id="tipPercent" type="number" min="0" step="0.1" value="15">
+  <label for="people">Number of people</label>
+  <input id="people" type="number" min="1" step="1" value="1">
+  <div class="row">
+    <button id="calculate">Calculate</button>
+    <button id="reset" type="button">Reset</button>
+  </div>
+  <div class="result" id="result">Tip per person: $0.00 — Total per person: $0.00</div>
+
+  <script>
+    // Get references to DOM elements
+    const billInput = document.getElementById('bill');
+    const tipInput = document.getElementById('tipPercent');
+    const peopleInput = document.getElementById('people');
+    const calculateBtn = document.getElementById('calculate');
+    const resetBtn = document.getElementById('reset');
+    const resultDiv = document.getElementById('result');
+
+    function formatMoney(amount) {
+      return amount.toLocaleString(undefined, { style: 'currency', currency: 'USD' });
+    }
+
+    function calculateTip() {
+      const bill = parseFloat(billInput.value) || 0;
+      const tipPercent = parseFloat(tipInput.value) || 0;
+      const people = parseInt(peopleInput.value) || 1;
+
+      if (people <= 0) {
+        resultDiv.textContent = 'Number of people must be at least 1';
+        return;
+      }
+
+      const tipTotal = bill * (tipPercent / 100);
+      const total = bill + tipTotal;
+      const tipPerPerson = tipTotal / people;
+      const totalPerPerson = total / people;
+
+      resultDiv.textContent = `Tip per person: ${formatMoney(tipPerPerson)} — Total per person: ${formatMoney(totalPerPerson)}`;
+    }
+
+    calculateBtn.addEventListener('click', calculateTip);
+    resetBtn.addEventListener('click', () => {
+      billInput.value = '';
+      tipInput.value = '15';
+      peopleInput.value = '1';
+      resultDiv.textContent = 'Tip per person: $0.00 — Total per person: $0.00';
+    });
+
+    // Optional: Calculate as user types
+    [billInput, tipInput, peopleInput].forEach(el =>
+      el.addEventListener('input', () => {
+        // Only calculate if there's a bill entered
+        if (billInput.value.trim() !== '') calculateTip();
+      })
+    );
+  </script>
+</body>
+</html>
